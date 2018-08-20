@@ -23,8 +23,62 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            configSource:
+              type: object
+            metadata:
+              type: object
+            providerConfig:
+              properties:
+                value:
+                  type: object
+                valueFrom:
+                  type: object
+              type: object
+            taints:
+              items:
+                type: object
+              type: array
+            versions:
+              properties:
+                controlPlane:
+                  type: string
+                kubelet:
+                  type: string
+              required:
+              - kubelet
+              type: object
+          required:
+          - providerConfig
           type: object
         status:
+          properties:
+            addresses:
+              items:
+                type: object
+              type: array
+            errorMessage:
+              type: string
+            errorReason:
+              type: string
+            lastUpdated:
+              format: date-time
+              type: string
+            nodeRef:
+              type: object
+            providerStatus:
+              type: object
+            versions:
+              properties:
+                controlPlane:
+                  type: string
+                kubelet:
+                  type: string
+              required:
+              - kubelet
+              type: object
+          required:
+          - providerStatus
           type: object
       type: object
   version: v1alpha1
