@@ -67,6 +67,30 @@ rules:
 - apiGroups:
   - cluster.k8s.io
   resources:
+  - machinedeployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - cluster.k8s.io
+  resources:
   - machinesets
   verbs:
   - get
