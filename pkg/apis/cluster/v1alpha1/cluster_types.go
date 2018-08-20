@@ -18,22 +18,10 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+
+	"sigs.k8s.io/cluster-api/pkg/apis/cluster/common"
 )
-
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
-// ClusterSpec defines the desired state of Cluster
-type ClusterSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
-
-// ClusterStatus defines the observed state of Cluster
-type ClusterStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-}
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -46,6 +34,71 @@ type Cluster struct {
 
 	Spec   ClusterSpec   `json:"spec,omitempty"`
 	Status ClusterStatus `json:"status,omitempty"`
+}
+
+// ClusterSpec defines the desired state of Cluster
+type ClusterSpec struct {
+	// Cluster network configuration
+	ClusterNetwork ClusterNetworkingConfig `json:"clusterNetwork"`
+
+	// Provider-specific serialized configuration to use during
+	// cluster creation. It is recommended that providers maintain
+	// their own versioned API types that should be
+	// serialized/deserialized from this field.
+	// +optional
+	ProviderConfig ProviderConfig `json:"providerConfig"`
+}
+
+// ClusterNetworkingConfig specifies the different networking
+// parameters for a cluster.
+type ClusterNetworkingConfig struct {
+	// The network ranges from which service VIPs are allocated.
+	Services NetworkRanges `json:"services"`
+
+	// The network ranges from which POD networks are allocated.
+	Pods NetworkRanges `json:"pods"`
+
+	// Domain name for services.
+	ServiceDomain string `json:"serviceDomain"`
+}
+
+// NetworkRanges represents ranges of network addresses.
+type NetworkRanges struct {
+	CIDRBlocks []string `json:"cidrBlocks"`
+}
+
+// ClusterStatus defines the observed state of Cluster
+type ClusterStatus struct {
+	// APIEndpoint represents the endpoint to communicate with the IP.
+	APIEndpoints []APIEndpoint `json:"apiEndpoints"`
+
+	// NB: Eventually we will redefine ErrorReason as ClusterStatusError once the
+	// following issue is fixed.
+	// https://github.com/kubernetes-incubator/apiserver-builder/issues/176
+
+	// If set, indicates that there is a problem reconciling the
+	// state, and will be set to a token value suitable for
+	// programmatic interpretation.
+	ErrorReason common.ClusterStatusError `json:"errorReason"`
+
+	// If set, indicates that there is a problem reconciling the
+	// state, and will be set to a descriptive error message.
+	ErrorMessage string `json:"errorMessage"`
+
+	// Provider-specific status.
+	// It is recommended that providers maintain their
+	// own versioned API types that should be
+	// serialized/deserialized from this field.
+	ProviderStatus *runtime.RawExtension `json:"providerStatus"`
+}
+
+// APIEndpoint represents a reachable Kubernetes API endpoint.
+type APIEndpoint struct {
+	// The hostname on which the API server is serving.
+	Host string `json:"host"`
+
+	// The port on which the API server is serving.
+	Port int `json:"port"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
